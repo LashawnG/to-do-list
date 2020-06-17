@@ -92,4 +92,19 @@ table.table .form-control {
     width: 30%;
 }
 
+a#backBtn {
+    font-size: 20px;
+    position: relative;
+    right: 40px;
+    top: 25px;
+    text-decoration: none;
+    color: black;
+}
+
+a#backBtn:hover {
+    color: #5bc0de;
+}
+
+
+
 

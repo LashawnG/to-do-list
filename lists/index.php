@@ -50,12 +50,15 @@ $result = $stmt->fetchAll();
                     ?>
                 <tr>
                     <td colspan="3"><?php echo $row['list_name'] ?></td>
+<!--                    update-->
                     <td>
                         <a href="updateList.php?list_id=<?php echo $row['id']?>&list_name=<?php echo $row['list_name']?>"><span id="edit" class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>
                     </td>
+<!--                    view-->
                     <td>
-                        <a href="#"><span id="view" class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                        <a href="listDetails.php?list_id=<?php echo $row['id']?>&list_name=<?php echo $row['list_name']?>"><span id="view" class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
                     </td>
+<!--                    delete-->
                     <td>
                         <a href="deleteList.php?list_id=<?php echo $row['id']?>&list_name=<?php echo $row['list_name']?>"><span id="delete" class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                     </td>
