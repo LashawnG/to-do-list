@@ -1,55 +1,35 @@
 <?php
 require '../connect.php';
 
-//$sql = "INSERT INTO tasks (task_name, list_id, duration) VALUES (:task_name , :list_id, :duration)";
-//$query = $conn->prepare($sql);
-//$query->execute([
-//    'task_name' => $task_name,
-//    'list_id' => $list_id,
-//    'duration' => $duration
-//]);
-
+$filter = $_POST['filter'];
+$sorter = $_POST['sorter'];
 $list_id = $_GET['list_id'];
 $list_name = $_GET['list_name'];
-$filter = 'true';
-$rowName = 'finished';
 
-
-
-$statement = "SELECT * FROM tasks WHERE list_id = :list_id AND finished = false ORDER BY finished DESC";
-
-
-////Afgerond
-//if ($_POST['sorter'] == 'finished') {
-//    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY finished DESC";
-//
-//    //Niet afgerond
-//} else if ($_POST['sorter'] == 'notFinished') {
-//    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY finished";
-//
-//    //Duur laag > hoog
-//} else if ($_POST['sorter'] == 'low') {
-//    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY duration";
-//
-//    //Duur hoog > laag
-//} else if ($_POST['sorter'] == 'high') {
-//    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY duration DESC";
-//}  else {
-//
-//    //Niet gesorteerd
-//    $statement = "SELECT * FROM tasks WHERE list_id = :list_id";
-//}
-
-
-
-
-
+if ($filter == 'low') {
+    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND duration < 30";
+}
+else if ($filter == 'high') {
+    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND duration > 30";
+}
+else if ($filter == 'finished') {
+    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND finished = 'true'";
+}
+else if ($filter == 'notFinished') {
+    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND finished = 'false'";
+}else if ($sorter == 'notDone') {
+    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY finished";
+}
+//Default
+else {
+    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY finished DESC";
+}
 
 $stmt = $conn->prepare($statement);
 
 
 $stmt->bindParam(':list_id', $list_id);
-//$stmt->bindParam(':filter', $filter);
+//$stmt->bindParam(':sorter', $sorter);
 $stmt->execute();
 $result = $stmt->fetchAll();
 ?>
@@ -125,10 +105,8 @@ $result = $stmt->fetchAll();
             <div class="form-group">
                 <label for="sorter">Sorteer op:</label>
                 <select name="sorter" class="form-control">
-                    <option value="notFinished">Status: Niet klaar</option>
-                    <option value="finished">Status: Afgerond</option>
-                    <option value="low">Duur: laag > hoog</option>
-                    <option value="high">Duur: hoog > laag</option>
+                    <option value="notDone">Status: Niet klaar</option>
+                    <option value="Done">Status: Afgerond</option>
                 </select>
                 <button class="btn btn-info add-new" type="submit">Sorteer</button>
             </div>
@@ -140,7 +118,7 @@ $result = $stmt->fetchAll();
             <form method="post" action="">
                 <div class="form-group">
                     <label for="sorter">Filter op:</label>
-                    <select name="sorter" class="form-control">
+                    <select name="filter" class="form-control">
                         <option value="notFinished">Status: Niet klaar</option>
                         <option value="finished">Status: Afgerond</option>
                         <option value="low">Duur: < 30 minuten</option>
@@ -152,5 +130,4 @@ $result = $stmt->fetchAll();
         </div>
     </div>
 </div>
-
 </body>
