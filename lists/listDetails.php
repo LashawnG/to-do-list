@@ -1,36 +1,43 @@
 <?php
 require '../connect.php';
 
+$status = '';
 $filter = $_POST['filter'];
 $sorter = $_POST['sorter'];
 $list_id = $_GET['list_id'];
 $list_name = $_GET['list_name'];
 
+//filteren
 if ($filter == 'low') {
-    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND duration < 30";
+    $status = 'AND duration < 30';
 }
 else if ($filter == 'high') {
-    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND duration > 30";
+    $status = 'AND duration > 30';
 }
 else if ($filter == 'finished') {
-    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND finished = 'true'";
+    $status = "AND finished = 'true'";
 }
 else if ($filter == 'notFinished') {
-    $statement = "SELECT * FROM tasks WHERE list_id = :list_id AND finished = 'false'";
-}else if ($sorter == 'notDone') {
-    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY finished";
-}
-//Default
-else {
-    $statement = "SELECT * FROM tasks WHERE list_id = :list_id ORDER BY finished DESC";
+    $status = "AND finished = 'false'";
+
+//Sorteren
+} else if($filter == 'sortFinished') {
+    $status = 'ORDER BY finished DESC';
+} else if($filter == 'sortNotFinished') {
+    $status = 'ORDER BY finished';
 }
 
+//Alles in de lijst weergeven
+else if ($filter = 'all') {
+    $status = '';
+}
+
+$statement = "SELECT * FROM tasks WHERE list_id = :list_id $status";
 $stmt = $conn->prepare($statement);
 
-
-$stmt->bindParam(':list_id', $list_id);
-//$stmt->bindParam(':sorter', $sorter);
-$stmt->execute();
+$stmt->execute([
+    'list_id' => $list_id,
+]);
 $result = $stmt->fetchAll();
 ?>
 
@@ -99,30 +106,19 @@ $result = $stmt->fetchAll();
 
         </table>
 
-<!--        Sorteren-->
-        <div class="col-sm-3">
-        <form method="post" action="">
-            <div class="form-group">
-                <label for="sorter">Sorteer op:</label>
-                <select name="sorter" class="form-control">
-                    <option value="notDone">Status: Niet klaar</option>
-                    <option value="Done">Status: Afgerond</option>
-                </select>
-                <button class="btn btn-info add-new" type="submit">Sorteer</button>
-            </div>
-        </form>
-        </div>
-
-<!--        Filteren-->
+<!--        Filteren/Sorteren-->
         <div class="col-sm-3">
             <form method="post" action="">
                 <div class="form-group">
-                    <label for="sorter">Filter op:</label>
+                    <label for="sorter">Filter/Sorteer op:</label>
                     <select name="filter" class="form-control">
-                        <option value="notFinished">Status: Niet klaar</option>
-                        <option value="finished">Status: Afgerond</option>
-                        <option value="low">Duur: < 30 minuten</option>
-                        <option value="high">Duur: > 30 minuten</option>
+                        <option value="notFinished">Filter: Niet klaar</option>
+                        <option value="finished">Filter: Afgerond</option>
+                        <option value="low">Filter: duur < 30 minuten</option>
+                        <option value="high">Filter: duur > 30 minuten</option>
+                        <option value="sortFinished">Sorteer: Afgerond</option>
+                        <option value="sortNotFinished">Sorteer: Niet klaar</option>
+                        <option value="all">Geen</option>
                     </select>
                     <button class="btn btn-info add-new" type="submit">Filter</button>
                 </div>
